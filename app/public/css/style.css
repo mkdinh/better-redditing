@@ -1,0 +1,48 @@
+nav{
+    border-bottom: 2px solid #d4d4d4;
+    margin-bottom: 1rem;
+}
+
+.navbar-item img{
+    max-height: 3rem
+}
+
+#logo-title{
+    font-size: 2rem;
+    padding: 0 1rem;
+}
+
+
+/* preview column */
+
+#column-preview-content{
+    padding: 1rem;
+    border: 1px solid #f5f5f5
+}
+
+.level{
+    width: 100%
+}
+
+.post{
+    opacity: 0;
+    transition: box-shadow 300ms
+}
+
+.post:hover{
+    box-shadow: 0px 0px 10px red;
+}
+
+.post-rank{
+    font-weight: bold;
+    text-align: center;
+}
+
+nav.is-mobile.level{
+    border-bottom: 0px solid black
+}
+
+
+
+
+
