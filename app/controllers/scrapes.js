@@ -20,69 +20,80 @@ router.get("/subreddit/all", (req,res) => {
 })
 
 router.get("/scrape/:subreddit", (req,res) => {
-    request(`https://www.reddit.com/r/${req.params.subreddit}`, (error,response, html) => {
+    let options = {
+        url: `https://www.reddit.com/r/${req.params.subreddit}/`,
+        followRedirect: false
+    }
     
-        // load subreddit html with cherrio
-        var $ = cherrio.load(html);
+    request(options, (error,response, html) => {
+        if(error){
+            res.send(error)
+        }else if(response.statusCode !== 200){   
+            res.status(500).send({msg: "No subreddit was found"})
+        }else{
+            
+            // load subreddit html with cherrio
+            var $ = cherrio.load(html);
 
 
-        // create new subreddit model
-        var subreddit = Subreddit({
-            name: req.params.subreddit
-        });
+            // create new subreddit model
+            var subreddit = Subreddit({
+                name: req.params.subreddit
+            });
 
-        Subreddit.findOneAndUpdate(
-            {name: req.params.subreddit}, 
-            {$unset: {posts: 1}, $set: {lastUpdated: Date.now()}}, 
-            {upsert: true, new: true}, 
-            (err, doc) => {
-                if(err){
-                    console.log(err);
-                }else{
+            Subreddit.findOneAndUpdate(
+                {name: req.params.subreddit}, 
+                {$unset: {posts: 1}, $set: {lastUpdated: Date.now()}}, 
+                {upsert: true, new: true}, 
+                (err, doc) => {
+                    if(err){
+                        console.log(err);
+                    }else{
 
-                    let count = 0;
+                        let count = 0;
 
-                    // referencing individual posts
-                    $('div.thing').each((i, element) => {
-                        
-                        // empty post object for scraping info
-                        let post = {};
-                        
-                        // scraping info from subreddit
-                        post.subreddit = req.params.subreddit;
-                        post.rank = parseInt($(element).find("span.rank").text()) || 0;
-                        post.title = $(element).find('a.title').text();
-                        post.link = $(element).find('li.first').children('a').attr('href')
-                        post.img = $(element).find('a.thumbnail').children('img').attr('src');
-                        post.upvote = $(element).find('div.score.unvoted').text();
+                        // referencing individual posts
+                        $('div.thing').each((i, element) => {
+                            
+                            // empty post object for scraping info
+                            let post = {};
+                            
+                            // scraping info from subreddit
+                            post.subreddit = req.params.subreddit;
+                            post.rank = parseInt($(element).find("span.rank").text()) || 0;
+                            post.title = $(element).find('a.title').text();
+                            post.link = $(element).find('li.first').children('a').attr('href')
+                            post.img = $(element).find('a.thumbnail').children('img').attr('src');
+                            post.upvote = $(element).find('div.score.unvoted').text();
 
 
-                        let postDB = new Post(post)
+                            let postDB = new Post(post)
 
-                        // append post into database
-                        postDB.save((err,post) => {
-                            if(err){
-                                console.log(err);
-                            }else{
-                                
-                                Subreddit.findOneAndUpdate({name: req.params.subreddit}, {$push: {"posts": post._id}}, (err,resPost) => {
-                                    // increase counter
-                                    count++;
-        
-                                    // if counter reaches desired number of post, send populate subreddit doc
-                                    if(count === 25){
-                                        Subreddit.findOne({name: req.params.subreddit})
-                                            .populate({path: "posts", match: {rank: {$gt: 0} } , options: {sort: {rank:1}}})
-                                            .exec((err,subreddit) => {
-                                                res.send(err || subreddit)
-                                            })
-                                    }
-                                })
-                            }
-                        })
-                    });
-            };
-        });
+                            // append post into database
+                            postDB.save((err,post) => {
+                                if(err){
+                                    console.log(err);
+                                }else{
+                                    
+                                    Subreddit.findOneAndUpdate({name: req.params.subreddit}, {$push: {"posts": post._id}}, (err,resPost) => {
+                                        // increase counter
+                                        count++;
+            
+                                        // if counter reaches desired number of post, send populate subreddit doc
+                                        if(count === 25){
+                                            Subreddit.findOne({name: req.params.subreddit})
+                                                .populate({path: "posts", match: {rank: {$gt: 0} } , options: {sort: {rank:1}}})
+                                                .exec((err,subreddit) => {
+                                                    res.send(err || subreddit)
+                                                })
+                                        }
+                                    })
+                                }
+                            })
+                        });
+                };
+            });
+        };
     });
 });
 

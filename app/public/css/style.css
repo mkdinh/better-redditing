@@ -19,11 +19,30 @@ nav{
     margin: 1%;
 }
 
+.button:focus,.button:focus:not(:active){
+    box-shadow: 0 0 5px  #ee442b;
+    border-color: rgba(238,68,43,0.7)
+}
+
 /* preview column */
 
-#column-preview-content{
+.panel-content{
     padding: 1rem;
     border: 1px solid #f5f5f5
+}
+
+.panel-heading a, .icon {
+    color: #ee442b;
+    transition: color 250ms
+}
+
+.panel-heading a:hover, .icon:hover {
+    color: #ad3625
+}
+
+.input:focus, .input:active{
+    box-shadow: 0 0 5px  #ee442b;
+    border-color: rgba(238,68,43,0.7)
 }
 
 .level{
@@ -63,6 +82,11 @@ nav{
 
 nav.is-mobile.level{
     border-bottom: 0px solid black
+}
+
+/* saved-posts-content */
+#column-saved-content{
+    display: none
 }
 
 

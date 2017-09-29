@@ -12,6 +12,13 @@ router.get('/save/:id', (req,res) => {
     });
 });
 
+
+router.get('/unsave/:id', (req,res) => {
+    Post.findOneAndUpdate({_id: req.params.id}, {saved: false},{new: true}, (err, post) => {
+        res.send(err || post);
+    });
+});
+
 router.get("/saved/:subreddit", (req,res) => {
     Post.find({subreddit: req.params.subreddit, saved: true}).populate("comment").exec((err,posts) =>{
         res.send(err || posts);

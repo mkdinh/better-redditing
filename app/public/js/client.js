@@ -1,6 +1,7 @@
 // GATHER SAVED SUBREDDITS
 // ------------------------------------------------
 let currentSub;
+let currentContent = 'recent';  
 
 // GATHER SAVED SUBREDDITS
 // ------------------------------------------------
@@ -26,13 +27,40 @@ let currentSub;
 // click listener on sub reddit btn
 $('#column-subreddit').on('click','.btn-subreddit' , ev => {
     let btn = ev.currentTarget;
+    $(btn).addClass('is-loading');
     let name = $(btn).attr('data-name');
-    scrape(name);
     currentSub = name;
+
+    if(currentContent === 'recent'){
+        
+        $.ajax({
+            url: `/scrape/${name}`,
+            method: "GET",
+            success: (subreddit) => {
+                console.log()
+                // empty out div
+                $("#column-preview-content").empty();
+            
+                // append post to browser with results
+                subreddit.posts.forEach((post) => {mediabuilder(post,'preview')});
+
+                // fade in posts
+                $('.post').animate({opacity: 1}, 300);
+            },
+            error: (xhr, status, error) => {
+                alert(xhr.responseJSON.msg)
+            },
+            complete: () => {$(btn).removeClass('is-loading')}
+        })
+    }else if(currentContent === 'saved'){
+        // simulate clicking on saved post link 
+        $("#saved-posts").click();
+        $(btn).removeClass('is-loading')
+    }
 });
 
 $('#saved-posts').on('click', ev => {
-    console.log(currentSub)
+    currentContent = 'saved';
     $.ajax({
         url: `post/saved/${currentSub}`,
         method: 'GET',
@@ -40,36 +68,66 @@ $('#saved-posts').on('click', ev => {
             $('#column-preview-content').hide();
             $('#column-saved-content').empty();
             $('#column-saved-content').show();
-            posts.forEach((post) => {mediabuilder(post,'saved')});
-
-            // fade in posts
-            $('.post').animate({opacity: 1}, 400);
+            if(posts.length === 0){
+                $('#column-saved-content').append('No saved post for this subreddit!')
+            }else{
+                posts.forEach((post) => {mediabuilder(post,'saved')});
+                // fade in posts
+                $('.post').animate({opacity: 1}, 300);
+            }
         }
     });
 });
 
 $('#recent-posts').on('click', ev => {
+    currentContent = 'recent';
     $('#column-saved-content').hide()
-    $('#column-preview-content').fadeIn();
+    $('#column-preview-content').fadeIn(300);
 });
 
 // search new subreddit
 $('#search-subreddit').on('keyup', ev => {
     if(ev.which === 13){
         var textBox = ev.currentTarget;
-        let name = $(textBox).val().trim();
-        scrape(name);
+        let name = $(textBox).val().trim().replace(" ","");
+        
+        $.ajax({
+            url: `/scrape/${name}`,
+            method: "GET",
+            success: (subreddit) => {
+                console.log('yo')
+                // empty out div
+                $("#column-preview-content").empty();
+            
+                // append post to browser with results
+                subreddit.posts.forEach((post) => {mediabuilder(post,'preview')});
+    
+                // fade in posts
+                $('.post').animate({opacity: 1}, 300);
+                currentSub = name;
 
-        var btn  = `<button class='button btn-subreddit' data-name='${name}'>${name}</button>`
-        $('#column-subreddit').append(btn)
+                var btn  = `<button class='button btn-subreddit' data-name='${name}'>${name}</button>`
+                $('#column-subreddit').append(btn)
+            },
+            error: (xhr, status, error) => {
+                alert(xhr.responseJSON.msg)
+            }
+        })
+
     };
 });
 
 $('#column-preview').on('click','.delete', ev => {
     let id = $(ev.currentTarget).attr('data-id');
-    $(`#post-${id}`).fadeOut(300, (post) => {
-        $(post.currentTarget).remove();
-    });
+    $.ajax({
+        url: `post/unsave/${id}`,
+        method: "GET",
+        success: () => {
+            $(`#post-${id}`).fadeOut(300, (post) => {
+                $(post.currentTarget).remove();
+            });
+        }
+    })
 })
 
 $('#column-preview').on('click','.comment-icon',ev => {
@@ -103,26 +161,6 @@ $('#column-preview').on('keyup','.comment-input',ev => {
 // SCRAPING AJAX
 // ------------------------------------------------------------
 
-// scrape subreddit and append to browser
-
-function scrape(name){
-    $.ajax({
-        url: `/scrape/${name}`,
-        method: "GET",
-        success: (subreddit) => {
-            console.log(subreddit)
-            // empty out div
-            $("#column-preview-content").empty();
-        
-            // append post to browser with results
-            subreddit.posts.forEach((post) => {mediabuilder(post,'preview')});
-
-            // fade in posts
-            $('.post').animate({opacity: 1}, 400);
-            currentSub = name;
-        }
-    })
-}
 
 // media object builder
 function mediabuilder(obj,column){
