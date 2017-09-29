@@ -17,7 +17,9 @@ mongoose.Promise = Promise;
 // ------------------------------------------------------------------
 
 // -connection mongoose to mongo server
-mongoose.connect('mongodb://localhost/better-redditing');
+let dbURI = 'mongodb://heroku_ft594rs4:58eplqt67m56e0aqi83cptlbfn@ds149144.mlab.com:49144/heroku_ft594rs4';
+mongoose.connect(dbURI);
+// mongoose.connect('mongodb://localhost/better-redditing');
 const db = mongoose.connection;
 
 // on error, console log out error
