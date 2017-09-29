@@ -2,6 +2,7 @@
 // ------------------------------------------------
 let currentSub;
 let currentContent = 'recent';  
+let allSub = [];
 
 // GATHER SAVED SUBREDDITS
 // ------------------------------------------------
@@ -14,6 +15,7 @@ let currentContent = 'recent';
             // append subreddit to browser
             subreddits.forEach((sub) => {
                 var name = sub.name;
+                allSub.push(name)
                 var btn  = `<button class='button btn-subreddit' data-name='${name}'>${name}</button>`
                 $('#column-subreddit').append(btn)
             })
@@ -106,8 +108,10 @@ $('#search-subreddit').on('keyup', ev => {
                 $('.post').animate({opacity: 1}, 300);
                 currentSub = name;
 
-                var btn  = `<button class='button btn-subreddit' data-name='${name}'>${name}</button>`
-                $('#column-subreddit').append(btn)
+                if(allSub.indexOf(name) === -1){
+                    var btn  = `<button class='button btn-subreddit' data-name='${name}'>${name}</button>`
+                    $('#column-subreddit').append(btn)
+                };
             },
             error: (xhr, status, error) => {
                 alert(xhr.responseJSON.msg)
