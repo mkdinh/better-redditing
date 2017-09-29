@@ -39,6 +39,7 @@ $('#saved-posts').on('click', ev => {
         success: (posts) => {
             $('#column-preview-content').hide();
             $('#column-saved-content').empty();
+            $('#column-saved-content').show();
             posts.forEach((post) => {mediabuilder(post,'saved')});
 
             // fade in posts
