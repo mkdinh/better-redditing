@@ -12,6 +12,12 @@ nav{
     padding: 0 1rem;
 }
 
+/* subreddit column */
+
+.btn-subreddit{
+    min-width: 30%;
+    margin: 1%;
+}
 
 /* preview column */
 
@@ -38,9 +44,30 @@ nav{
     text-align: center;
 }
 
+.post-upvote{
+    margin-right: 1rem
+}
+
+.no-shrink{
+    flex-shrink: 0;
+    width: 100%
+}
+
+.comment-edit{
+    display: none;
+}
+
+.comment-input{
+    width: 80%
+}
+
 nav.is-mobile.level{
     border-bottom: 0px solid black
 }
+
+
+
+
 
 
 

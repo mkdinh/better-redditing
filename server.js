@@ -47,10 +47,12 @@ app.use(express.static(path.join(__dirname, 'app/public')));
 
 // set route for HTTP requests
 const scraper_API = require( path.join(__dirname, '/app/controllers/scrapes.js'));
-const comment_API = require( path.join(__dirname, '/app/controllers/comments.js'));
+const post_API = require( path.join(__dirname, '/app/controllers/posts.js'));
+// const comment_API = require( path.join(__dirname, '/app/controllers/comments.js'));
 
 app.use("/", scraper_API);
-app.use("/comment", comment_API);
+app.use("/post", post_API);
+// app.use("/comment", comment_API);
 
 // start server
 app.listen(port, () => {

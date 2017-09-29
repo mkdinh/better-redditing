@@ -3,9 +3,6 @@ const mongoose = require('mongoose');
 
 // create sub reddit post schema
 var CommentSchema = new mongoose.Schema({
-    title: {
-        type: String
-    },
     body: {
         type: String
     }

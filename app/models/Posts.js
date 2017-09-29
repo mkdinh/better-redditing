@@ -31,11 +31,11 @@ var PostSchema = new mongoose.Schema({
         required: true,
         default: "NaN"
     },
-    comments: [{
+    comment: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Comments"
-    }],
-    viewed: {
+        ref: "Comment"
+    },
+    saved: {
         type: Boolean,
         required: true,
         default: false
